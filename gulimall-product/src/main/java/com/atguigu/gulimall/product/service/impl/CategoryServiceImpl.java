@@ -1,7 +1,11 @@
 package com.atguigu.gulimall.product.service.impl;
 
+import com.atguigu.gulimall.product.entity.AttrGroupEntity;
+import com.atguigu.gulimall.product.service.CategoryBrandRelationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -16,10 +20,21 @@ import com.atguigu.common.utils.Query;
 import com.atguigu.gulimall.product.dao.CategoryDao;
 import com.atguigu.gulimall.product.entity.CategoryEntity;
 import com.atguigu.gulimall.product.service.CategoryService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service("categoryService")
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
+
+    @Autowired
+    private CategoryBrandRelationService categoryBrandRelationService;
+
+    @Transactional
+    @Override
+    public void updateCascade(CategoryEntity category) {
+        this.updateById(category);
+        categoryBrandRelationService.updateCategory(category.getCatId(), category.getName());
+    }
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -64,5 +79,29 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return children;
     }
 
+    /**
+     * 给一个第三级路径，返回完整的三级分类路径
+     * @param catelogId (e.g. 225)
+     * @return (e.g. [2, 234, 225])
+     */
+    @Override
+    public Long[] findCatelogPath(Long catelogId) {
+        List<Long> paths = new ArrayList<>();
+        List<Long> wholePath = findParentPath(catelogId, paths);
 
+        return wholePath.toArray(new Long[wholePath.size()]);
+    }
+    /*
+        递归查找id=225的父节点id  [2, 234, 225]
+     */
+    private List<Long> findParentPath(Long catelogId, List<Long> paths) {
+        /* 1. 获取当前节点的id */
+        CategoryEntity byId = this.getById(catelogId);
+        /* 2. 递归查找父节点，直到当前节点的父节点=0，即找到最顶端节点，停 */
+        if(byId.getParentCid() != 0) {
+            findParentPath(byId.getParentCid(), paths);
+        }
+        paths.add(catelogId);
+        return paths;
+    }
 }
