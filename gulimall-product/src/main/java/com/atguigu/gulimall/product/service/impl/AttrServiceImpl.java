@@ -28,6 +28,7 @@ import com.atguigu.gulimall.product.dao.AttrDao;
 import com.atguigu.gulimall.product.entity.AttrEntity;
 import com.atguigu.gulimall.product.service.AttrService;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 
@@ -42,6 +43,9 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
 
     @Autowired
     private AttrGroupDao attrGroupDao;
+
+    @Autowired
+    private AttrDao attrDao;
 
     @Autowired
     private CategoryService categoryService;
@@ -166,4 +170,26 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
             }
         }
     }
+
+    /**
+     * 根据分组id查找关联的所有基本属性
+     * @param attrgroupId
+     * @return
+     */
+    @Override
+    public List<AttrEntity> getRelationAttr(Long attrgroupId) {
+        List<AttrAttrgroupRelationEntity> relationEntities = attrAttrgroupRelationDao.selectList(new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_group_id", attrgroupId));
+
+        /* 啊我觉得应该是因为返回的是一个map，所以得用stream */
+        List<Long> attrIds = relationEntities.stream().map((attr) -> {
+            return attr.getAttrId();
+        }).collect(Collectors.toList());
+
+        List<AttrEntity> attrEntities = null;  // 看见弹幕说这里要判断列表非空
+        if (!CollectionUtils.isEmpty(attrIds)) {
+            attrEntities = this.baseMapper.selectBatchIds(attrIds);
+        }
+        return attrEntities;
+    }
+
 }

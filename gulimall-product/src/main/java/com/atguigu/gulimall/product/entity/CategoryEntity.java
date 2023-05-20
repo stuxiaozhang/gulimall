@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 /**
@@ -64,5 +65,6 @@ public class CategoryEntity implements Serializable {
 		当前菜单包含的子分类（这个字段实际在表中不存在）
 	 */
 	@TableField(exist = false)
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)  // 字段返回不为空时，才带这个字段
 	private List<CategoryEntity> children;
 }
