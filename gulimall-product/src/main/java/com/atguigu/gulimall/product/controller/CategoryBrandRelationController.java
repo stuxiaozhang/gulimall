@@ -65,7 +65,7 @@ public class CategoryBrandRelationController {
     }
 
     /**
-     * 保存
+     * 保存详细细节
      */
     @RequestMapping("/save")
     //// @RequiresPermissions("product:categorybrandrelation:save")

@@ -37,11 +37,27 @@ public class BrandServiceImpl extends ServiceImpl<BrandDao, BrandEntity> impleme
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        // 1. 获取key
+        String key = (String) params.get("key");
+        QueryWrapper<BrandEntity> queryWrapper = new QueryWrapper<BrandEntity>().eq("brand_id", key);
+        /* 我加了一个条件，就是key模糊查询时，加上descript的描述 */
+        if(!StringUtils.isEmpty(key)) {
+            queryWrapper.and((obj) -> {
+                obj.like("name", key).or().like("descript", key);
+            });
+        }
+        /* 原版本写法 */
+        /*
+        QueryWrapper<BrandEntity> queryWrapper = new QueryWrapper<>();
+        if(!StringUtils.isEmpty(key)) {
+            queryWrapper.eq("brand_id", key).or().like("name", key);
+        }
+        */
+
         IPage<BrandEntity> page = this.page(
                 new Query<BrandEntity>().getPage(params),
-                new QueryWrapper<BrandEntity>()
+                queryWrapper
         );
-
         return new PageUtils(page);
     }
 

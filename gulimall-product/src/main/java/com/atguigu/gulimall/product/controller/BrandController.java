@@ -68,7 +68,7 @@ public class BrandController {
     }
 
     /**
-     * 修改
+     * 修改：要对品牌名字进行修改时，品牌分类关系表之中的名字也要进行修改
      */
     @RequestMapping("/update")
     //// @RequiresPermissions("product:brand:update")

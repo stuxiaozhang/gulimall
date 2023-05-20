@@ -7,6 +7,8 @@ import com.atguigu.gulimall.product.entity.CategoryEntity;
 import com.atguigu.gulimall.product.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -64,7 +66,7 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
         // 1. 查询 品牌名字和分类名字
         CategoryEntity categoryEntity = categoryDao.selectById(catelogId);
         BrandEntity brandEntity = brandDao.selectById(brandId);
-        // 2. 设置 新的品牌名字和分类名字
+        // 2. 设置 新的品牌名字和分类名字（保存到关联分类表里）
         categoryBrandRelation.setCatelogName(categoryEntity.getName());
         categoryBrandRelation.setBrandName(brandEntity.getName());
 

@@ -70,7 +70,7 @@ public class CategoryController {
     }
 
     /**
-     * 修改
+     * 修改：对分类名字修改的同时，也要修改相关的关联表数据
      */
     @RequestMapping("/update")
     //// @RequiresPermissions("product:category:update")
