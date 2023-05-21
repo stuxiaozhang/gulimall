@@ -90,4 +90,6 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         attrAttrgroupRelationDao.deleteBatchRelation(entities);
     }
 
+
+
 }
