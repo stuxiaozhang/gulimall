@@ -48,6 +48,8 @@ public class AttrGroupController {
         return R.ok().put("data", entities);
     }
 
+
+
     /**
      * 列表
      */
@@ -91,11 +93,11 @@ public class AttrGroupController {
     }
 
     /**
-     *
+     * 12.3 删除属性与分组的关联关系
      */
     @PostMapping("/attr/relation/delete")
     public R attrRelationDelete(@RequestBody AttrGroupRelationVo[] vos){
-        attrService.deleteRelation(vos);
+        attrGroupService.deleteRelation(vos);
         return R.ok();
     }
 

@@ -186,15 +186,12 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
             return attr.getAttrId();
         }).collect(Collectors.toList());
 
-        List<AttrEntity> attrEntities = null;  // 看见弹幕说这里要判断列表非空
-        if (!CollectionUtils.isEmpty(attrIds)) {
-            attrEntities = this.baseMapper.selectBatchIds(attrIds);
+        if (CollectionUtils.isEmpty(attrIds)) {
+        // if (attrIds == null || attrIds.size() == 0)
+            return null;
         }
+        List<AttrEntity> attrEntities = this.baseMapper.selectBatchIds(attrIds);
         return attrEntities;
     }
 
-    @Override
-    public void deleteRelation(AttrGroupRelationVo[] vos) {
-
-    }
 }
