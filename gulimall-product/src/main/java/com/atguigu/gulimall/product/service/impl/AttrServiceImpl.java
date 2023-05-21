@@ -194,4 +194,59 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         return attrEntities;
     }
 
+    /**
+     * 12.4 获取属性分组没有关联的其他属性
+     * @param params
+     * @param attrgroupId
+     * @return
+     */
+    @Override
+    public PageUtils getNoRelationAttr(Map<String, Object> params, Long attrgroupId) {
+        // 1. 当前分组只能关联自己所属的分类里面的所有属性(先查出当前分类id)
+        // 这里必须先拿分组再拿分组中的分类id，直接在属性中确实可以拿到分类id，但是不能保证是这个分组的属性
+        AttrGroupEntity attrGroupEntity = attrGroupDao.selectById(attrgroupId);
+        Long catelogId = attrGroupEntity.getCatelogId();
+
+        /** 找到本分类下所有属性，再判断关联的分组id是否为空
+         * 整体思路：先找出其他分组已经关联的属性，再排除掉这些属性即可
+         * 实现思路：
+         *      1. 根据catelogId获取分组对象集合
+         *         获取分组对象的attrGroupId并封装为集合
+         *      2. 根据attrGroupId获取中间表对象集合
+         *         获取中间表对象的attrId并封装为集合,此时就有了其他分组已经关联的属性
+         *      3. 移除这些属性
+         */
+        // 2、当前分组只能关联别的分组没有引用的属性
+        // 2.1 当前分类下的所有分组
+        List<AttrGroupEntity> attrGroupEntities = attrGroupDao.selectList(new QueryWrapper<AttrGroupEntity>().eq("catelog_id", catelogId));
+        List<Long> attrGroupIds = attrGroupEntities.stream().map(attrGroupEntity1 -> {
+            return attrGroupEntity1.getAttrGroupId();
+        }).collect(Collectors.toList());
+
+        // 2.2 这些分组关联的属性
+        List<AttrAttrgroupRelationEntity> relationEntities =
+                attrAttrgroupRelationDao.selectList(new QueryWrapper<AttrAttrgroupRelationEntity>().in("attr_group_id", attrGroupIds));
+        List<Long> attrIds = relationEntities.stream().map(attrAttrgroupRelationEntity -> {
+            return attrAttrgroupRelationEntity.getAttrId();
+        }).collect(Collectors.toList());
+
+        // 2.3 从当前分类(catelogId)的所有属性中移除这些属性
+        QueryWrapper<AttrEntity> queryWrapper =
+                new QueryWrapper<AttrEntity>().eq("catelog_id", catelogId).eq("attr_type", ProductConstant.AttrEnum.ATTR_TYPE_BASE.getCode());
+        if (attrIds != null && attrIds.size() > 0){
+        // if (!CollectionUtils.isEmpty(attrIds)) {
+            queryWrapper.notIn("attr_id", attrIds);
+        }
+
+        //模糊查询
+        String key = (String) params.get("key");
+        if (!StringUtils.isEmpty(key)) {
+            queryWrapper.and((wrapper) -> {
+                wrapper.eq("attr_id", key).or().like("attr_name", key);
+            });
+        }
+
+        IPage<AttrEntity> page = this.page(new Query<AttrEntity>().getPage(params), queryWrapper);
+        return new PageUtils(page);
+    }
 }
