@@ -176,7 +176,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
     }
 
     /**
-     * 根据分组id查找关联的所有基本属性
+     * 根据分组id(attrgroupId)查找关联的所有基本属性
      * @param attrgroupId
      * @return
      */
