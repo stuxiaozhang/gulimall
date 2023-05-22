@@ -4,12 +4,15 @@ import com.atguigu.gulimall.product.dao.BrandDao;
 import com.atguigu.gulimall.product.dao.CategoryDao;
 import com.atguigu.gulimall.product.entity.BrandEntity;
 import com.atguigu.gulimall.product.entity.CategoryEntity;
+import com.atguigu.gulimall.product.service.BrandService;
 import com.atguigu.gulimall.product.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -29,6 +32,12 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
 
     @Autowired
     private BrandDao brandDao;
+
+    @Autowired
+    private CategoryBrandRelationDao categoryBrandRelationDao;
+
+    @Autowired
+    private BrandService brandService;
 
     /**
      * 关联分类的brand信息更新。（法一）
@@ -53,6 +62,24 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
     @Override
     public void updateCategory(Long catId, String name) {
         this.baseMapper.updateCategroy(catId, name);
+    }
+
+    /**
+     * 13.2 获取分类关联的品牌（先在CategoryBrandRelation表中找catelog_id对应的实体，再获得其brandid，再去brand表查）
+     * @param catId
+     * @return
+     */
+    @Override
+    public List<BrandEntity> getBrandsByCatId(Long catId) {
+
+        List<CategoryBrandRelationEntity> relationEntities =
+                categoryBrandRelationDao.selectList(new QueryWrapper<CategoryBrandRelationEntity>().eq("catelog_id", catId));
+        List<BrandEntity> brandEntityList = relationEntities.stream().map(relationEntitiy -> {
+            Long brandId = relationEntitiy.getBrandId();
+            BrandEntity brandEntity = brandService.getById(brandId);// 相当于在brand表中查brandEntity
+            return brandEntity;
+        }).collect(Collectors.toList());
+        return brandEntityList;
     }
 
     /**
