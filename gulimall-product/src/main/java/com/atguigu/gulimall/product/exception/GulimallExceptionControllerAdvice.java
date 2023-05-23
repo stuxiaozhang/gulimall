@@ -1,4 +1,4 @@
-package com.atguigu.gulimall.product.controller;
+package com.atguigu.gulimall.product.exception;
 
 import com.atguigu.common.exception.BizCodeEnum;
 import com.atguigu.common.utils.R;
