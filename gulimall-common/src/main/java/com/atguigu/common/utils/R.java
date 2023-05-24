@@ -64,6 +64,6 @@ public class R extends HashMap<String, Object> {
 
 	/* 添加getCode方法，方便判断远程调用是否成功 */
 	public Integer getCode(){
-		return Integer.parseInt((String) this.get("code"));
+		return (Integer) this.get("code");
 	}
 }
