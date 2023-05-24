@@ -1,7 +1,9 @@
 package com.atguigu.gulimall.product.service.impl;
 
+import com.atguigu.common.to.SpuBoundTo;
 import com.atguigu.gulimall.product.entity.SpuImagesEntity;
 import com.atguigu.gulimall.product.entity.SpuInfoDescEntity;
+import com.atguigu.gulimall.product.fegin.CouponFeignService;
 import com.atguigu.gulimall.product.service.*;
 import com.atguigu.gulimall.product.vo.BaseAttrs;
 import com.atguigu.gulimall.product.vo.Bounds;
@@ -42,6 +44,10 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     @Autowired
     private SkuInfoService skuInfoService;
 
+    @Autowired
+    private CouponFeignService couponFeignService;
+
+
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<SpuInfoEntity> page = this.page(
@@ -80,7 +86,10 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
         // 5. 保存spu的积分信息 `gulimall_sms->sms_spu_bounds`
         Bounds bounds = vo.getBounds();
-
+        SpuBoundTo spuBoundTo = new SpuBoundTo();
+        BeanUtils.copyProperties(vo, spuBoundTo);
+        spuBoundTo.setSpuId(spuInfoEntity.getId());
+        couponFeignService.saveSpuBounds(spuBoundTo);
 
         // 6. 保存spu对应的所有sku信息
         List<Skus> skus = vo.getSkus();

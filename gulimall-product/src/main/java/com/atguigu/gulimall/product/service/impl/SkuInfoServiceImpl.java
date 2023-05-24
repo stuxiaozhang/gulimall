@@ -1,8 +1,11 @@
 package com.atguigu.gulimall.product.service.impl;
 
+import com.atguigu.common.to.SkuReductionTo;
+import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.product.entity.SkuImagesEntity;
 import com.atguigu.gulimall.product.entity.SkuSaleAttrValueEntity;
 import com.atguigu.gulimall.product.entity.SpuInfoEntity;
+import com.atguigu.gulimall.product.fegin.CouponFeignService;
 import com.atguigu.gulimall.product.service.SkuImagesService;
 import com.atguigu.gulimall.product.service.SkuSaleAttrValueService;
 import com.atguigu.gulimall.product.vo.Attr;
@@ -35,6 +38,9 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
 
     @Autowired
     private SkuSaleAttrValueService skuSaleAttrValueService;
+
+    @Autowired
+    private CouponFeignService couponFeignService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -99,6 +105,13 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
 
 
             // 6.4 sku的优惠、满减等信息 `gulimall_sms`->`sms_sku_ladder`/`sms_sku_full_reduction`/`sms_member_price`
+            SkuReductionTo skuReductionTo = new SkuReductionTo();
+            BeanUtils.copyProperties(sku, skuReductionTo);
+            skuReductionTo.setSkuId(skuId);
+            R r1 = couponFeignService.saveSkuReduction(skuReductionTo);
+            if (r1.getCode() != 0){
+                log.error("远程保存优惠信息失败");
+            }
         });
     }
 

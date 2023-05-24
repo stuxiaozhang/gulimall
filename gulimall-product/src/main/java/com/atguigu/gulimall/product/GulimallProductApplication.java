@@ -4,6 +4,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 
 /**
@@ -18,6 +19,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
  *          (2)告诉MyBatis-plus，sql映射文件的位置
  */
 
+@EnableFeignClients(basePackages = "com.atguigu.gulimall.product.fegin")
 @EnableDiscoveryClient
 @MapperScan("com.atguigu.gulimall.product.dao")
 @SpringBootApplication
