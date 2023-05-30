@@ -32,13 +32,13 @@ public class WareSkuController {
     private WareSkuService wareSkuService;
 
     /**
-     * 列表
+     * 列表:查询库存的模糊查询
      */
     @RequestMapping("/list")
     //// @RequiresPermissions("ware:waresku:list")
     public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = wareSkuService.queryPage(params);
-
+//        PageUtils page = wareSkuService.queryPage(params);
+        PageUtils page = wareSkuService.queryPageByCondition(params);
         return R.ok().put("page", page);
     }
 

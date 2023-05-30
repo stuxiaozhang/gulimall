@@ -32,12 +32,13 @@ public class PurchaseDetailController {
     private PurchaseDetailService purchaseDetailService;
 
     /**
-     * 列表
+     * 列表:采购需求的模糊查询
      */
     @RequestMapping("/list")
     //// @RequiresPermissions("ware:purchasedetail:list")
     public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = purchaseDetailService.queryPage(params);
+//        PageUtils page = purchaseDetailService.queryPage(params);
+        PageUtils page = purchaseDetailService.queryPageByCondition(params);
 
         return R.ok().put("page", page);
     }

@@ -1,6 +1,7 @@
 package com.atguigu.gulimall.product.service.impl;
 
 import com.atguigu.common.to.SpuBoundTo;
+import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.product.entity.SpuImagesEntity;
 import com.atguigu.gulimall.product.entity.SpuInfoDescEntity;
 import com.atguigu.gulimall.product.fegin.CouponFeignService;
@@ -27,6 +28,7 @@ import com.atguigu.gulimall.product.dao.SpuInfoDao;
 import com.atguigu.gulimall.product.entity.SpuInfoEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 
 @Service("spuInfoService")
@@ -58,6 +60,10 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         return new PageUtils(page);
     }
 
+    /**
+     * TODO 高级篇
+     * @param vo
+     */
     @Transactional
     @Override
     public void saveSpuInfo(SpuSaveVo vo) {
@@ -89,15 +95,55 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         SpuBoundTo spuBoundTo = new SpuBoundTo();
         BeanUtils.copyProperties(vo, spuBoundTo);
         spuBoundTo.setSpuId(spuInfoEntity.getId());
-        couponFeignService.saveSpuBounds(spuBoundTo);
+        R r = couponFeignService.saveSpuBounds(spuBoundTo);
+        if(r.getCode() != 0) {
+            log.error("远程保存spu积分信息失败");
+        }
 
         // 6. 保存spu对应的所有sku信息
         List<Skus> skus = vo.getSkus();
         if (!CollectionUtils.isEmpty(skus)) {
             skuInfoService.saveSkus(skus, spuInfoEntity);
         }
+    }
 
+    /**
+     * 按照条件返回spu页面
+     * @param params
+     * @return
+     */
+    @Override
+    public PageUtils queryPageByCondition(Map<String, Object> params) {
+        QueryWrapper<SpuInfoEntity> queryWrapper = new QueryWrapper<>();
 
+        String catelogId = (String) params.get("catelogId");
+        if (!StringUtils.isEmpty(catelogId) && !"0".equalsIgnoreCase(catelogId)){
+            queryWrapper.eq("catalog_id", catelogId);
+        }
+
+        String brandId = (String) params.get("brandId");
+        if (!StringUtils.isEmpty(brandId) && !"0".equalsIgnoreCase(brandId)){
+            queryWrapper.eq("brand_id", brandId);
+        }
+
+        String status = (String) params.get("status");
+        if (!StringUtils.isEmpty(status)){
+            queryWrapper.eq("publish_status", status);
+        }
+
+        String key = (String) params.get("key");
+        if(StringUtils.isEmpty(key)) {
+            queryWrapper.and(w -> {
+                w.eq("id", key).or().like("name", key);
+            });
+        }
+
+        IPage<SpuInfoEntity> page = this.page(
+                new Query<SpuInfoEntity>().getPage(params),
+                queryWrapper
+        );
+
+        return new PageUtils(page);
     }
 
     private void saveBaseSpuInfo(SpuInfoEntity spuInfoEntity) {

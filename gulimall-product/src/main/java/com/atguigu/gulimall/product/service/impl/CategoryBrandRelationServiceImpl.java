@@ -55,7 +55,7 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
     }
 
     /**
-     * 关联分类的category信息更新（法二）
+     * 关联分类的category信息更新（法二）bvcx
      * @param catId
      * @param name
      */

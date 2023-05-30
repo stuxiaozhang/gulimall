@@ -8,12 +8,12 @@ import java.util.List;
 @Data
 public class SkuReductionTo {
     private Long skuId;
-    private int fullCount;
-    private BigDecimal discount;
+    private int fullCount;  // 满几件
+    private BigDecimal discount;  // 打几折
     private int countStatus;
-    private BigDecimal fullPrice;
-    private BigDecimal reducePrice;
+    private BigDecimal fullPrice;  // 满多少
+    private BigDecimal reducePrice;  // 减多少
     private int priceStatus;
-    private List<MemberPrice> memberPrice;
+    private List<MemberPrice> memberPrice;  // 商品会员价格 实体
 }
 
