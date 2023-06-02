@@ -1,9 +1,12 @@
 package com.atguigu.gulimall.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 // import org.apache.shiro.authz.annotation.RequiresPermissions;
+import com.atguigu.gulimall.product.entity.ProductAttrValueEntity;
+import com.atguigu.gulimall.product.service.ProductAttrValueService;
 import com.atguigu.gulimall.product.vo.AttrRespVo;
 import com.atguigu.gulimall.product.vo.AttrVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +31,9 @@ import com.atguigu.common.utils.R;
 public class AttrController {
     @Autowired
     private AttrService attrService;
+
+    @Autowired
+    private ProductAttrValueService productAttrValueService;
 
 
     /**
@@ -67,6 +73,19 @@ public class AttrController {
     }
 
     /**
+     * 获取spu规格
+     * @param spuId
+     * @return
+     */
+    @GetMapping("/base/listforspu/{spuId}")
+    public R baseListforspu(@PathVariable("spuId") Long spuId) {
+        List<ProductAttrValueEntity> entityList = productAttrValueService.baseAttrlistForSpu(spuId);
+
+        return R.ok().put("data", entityList);
+    }
+
+
+    /**
      * 保存：前端需要的数据，比AttrEntity实体多了一些字段，需要建立AttrVo，然后把多出来的数据也分别保存到其他相应的表中
      */
     @RequestMapping("/save")
@@ -86,6 +105,19 @@ public class AttrController {
     public R update(@RequestBody AttrVo attr){
 //		attrService.updateById(attr);
         attrService.updateAttr(attr);
+        return R.ok();
+    }
+
+    /**
+     * 修改商品规格
+     * @param spuId
+     * @param entities
+     * @return
+     */
+    @PostMapping("/update/{spuId}")
+    public R updateSpuAttr(@PathVariable("spuId") Long spuId, @RequestBody List<ProductAttrValueEntity> entities){
+        productAttrValueService.updateSpuAttr(spuId, entities);
+
         return R.ok();
     }
 

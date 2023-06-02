@@ -58,7 +58,6 @@ public class PurchaseDetailServiceImpl extends ServiceImpl<PurchaseDetailDao, Pu
         );
 
         return new PageUtils(page);
-
     }
 
 }

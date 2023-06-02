@@ -60,4 +60,33 @@ public class ProductAttrValueServiceImpl extends ServiceImpl<ProductAttrValueDao
         this.saveBatch(productAttrValueEntities);
     }
 
+    /**
+     * 获取spu规格
+     * @param spuId
+     * @return
+     */
+    @Override
+    public List<ProductAttrValueEntity> baseAttrlistForSpu(Long spuId) {
+        List<ProductAttrValueEntity> entities = this.baseMapper.selectList(new QueryWrapper<ProductAttrValueEntity>().eq("spu_id", spuId));
+
+        return entities;
+    }
+
+    /**
+     * 修改商品规格
+     * 因为修改的时候，有新增有修改有删除。 所以就先把spuId对应的所有属性都删了，再新增
+     * @param spuId
+     * @param entities
+     */
+    @Override
+    public void updateSpuAttr(Long spuId, List<ProductAttrValueEntity> entities) {
+        // 1、删除这个spuId对应的所有属性
+        this.baseMapper.delete(new QueryWrapper<ProductAttrValueEntity>().eq("spu_id", spuId));
+        // 2、新增回去
+        for (ProductAttrValueEntity entity: entities) {
+            entity.setSpuId(spuId);
+        }
+        this.saveBatch(entities);
+    }
+
 }
